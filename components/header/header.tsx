@@ -19,7 +19,7 @@ const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
 }));
 
 export default function Header(props: any) {
-    const [cartOpen, setCartOpen] = useState(false);
+    const [cartOpen, setCartOpen] = useState<boolean>(false);
 
     const handleCartOpen = () => {
         setCartOpen(true);
@@ -31,6 +31,11 @@ export default function Header(props: any) {
 
     function handleCartChange(foodItem) {
         props.onCartChange(foodItem);
+    }
+
+    const handleCheckout = () => {
+        setCartOpen(false);
+        props.onCheckout();
     }
 
     return (
@@ -56,7 +61,13 @@ export default function Header(props: any) {
                     </IconButton>
                 </div>
             </Toolbar>
-            <Cart onCartChange={handleCartChange} cartOpen={cartOpen} cartItems={props.cart} onClose={handleCartClose} />
+            <Cart
+                onCartChange={handleCartChange}
+                cartOpen={cartOpen}
+                cartItems={props.cart}
+                onCheckout={handleCheckout}
+                onClose={handleCartClose}
+            />
         </Box>
     );
 }

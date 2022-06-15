@@ -9,44 +9,29 @@ import Stack from '@mui/material/Stack';
 import styles from './Cart.module.css';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-// const emails = ['username@gmail.com', 'user02@gmail.com'];
-
-// export interface SimpleDialogProps {
-//   open: boolean;
-//   selectedValue: string;
-//   onClose: (value: string) => void;
-// }
+import { FoodDetail } from '../../interfaces/FoodDetail';
 
 export default function Cart(props: any) {
     const { onClose, cartOpen, cartItems } = props;
-    const parsedCartItems = JSON.parse(cartItems);
+    const parsedCartItems: FoodDetail[] = JSON.parse(cartItems);
     const [totalCalories, setTotalCalories] = useState(0);
 
     useEffect(() => {
         if (parsedCartItems.length > 0) {
             updateTotalCalories();
+        } else {
+            setTotalCalories(0);
         }
     }, [cartItems])
 
     const updateTotalCalories = () => {
-        console.log(parsedCartItems)
         const itemCalorieArray = parsedCartItems.map((item) => item.foodNutrients.find((nut) => nut.nutrientNumber === '208'));
         if (itemCalorieArray.length > 1) {
-            setTotalCalories(itemCalorieArray.reduce((first, next) => first.value + next.value));
+            setTotalCalories(itemCalorieArray.map((nutrient) => nutrient.value).reduce((first, next) => first + next));
         } else {
             setTotalCalories(itemCalorieArray[0].value);
         }
-        // setTotalCalories(totalItemCalories);
     }
-
-    // const handleClose = () => {
-    //     onClose(selectedValue);
-    // };
-
-    // const handleListItemClick = (value: string) => {
-    //     onClose(value);
-    // };
 
     const getCalories = (cartItem: any) => {
         const item = cartItem.foodNutrients.find((nutrient) => nutrient.nutrientNumber === '208');
@@ -57,21 +42,27 @@ export default function Cart(props: any) {
         return cartItem.brandName ? `${cartItem.brandName}` : 'Unbranded'
     }
 
-    const updateCart = (cartItem: any) => {
+    const updateCart = (cartItem: FoodDetail) => {
         props.onCartChange(JSON.stringify(cartItem));
     }
 
     const DisplayCart = () => {
         if (parsedCartItems.length > 0) {
             return (
-                parsedCartItems.map((cartItem) => (
-                    <ListItem button key={cartItem.fdcId}>
-                        <ListItemText className={styles.linebreak} primary={cartItem.description} secondary={`${getBrandName(cartItem)}\n${getCalories(cartItem)}`} />
-                        <IconButton onClick={() => updateCart(cartItem)} aria-label="delete">
-                            <DeleteIcon />
-                        </IconButton>
-                    </ListItem>
-                ))
+                <div>
+                    {parsedCartItems.map((cartItem: FoodDetail) => (
+                        <ListItem button key={cartItem.fdcId}>
+                            <ListItemText
+                                className={styles.linebreak}
+                                primary={cartItem.description}
+                                secondary={`${getBrandName(cartItem)}\n${getCalories(cartItem)}`}
+                            />
+                            <IconButton onClick={() => updateCart(cartItem)} aria-label="delete">
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItem>
+                    ))}
+                </div>
             )
         } else {
             return (
@@ -88,10 +79,21 @@ export default function Cart(props: any) {
             <List sx={{ pt: 0 }}>
                 <DisplayCart />
             </List>
-            <h3>total cal: {totalCalories}</h3>
-            <Stack spacing={1} direction="row">
-                <Button variant="text" onClick={props.onClose}>Cancel</Button>
-                <Button variant="contained" disabled={parsedCartItems.length === 0}>Checkout</Button>
+            <h5 className={styles.center}>Total Calories: {totalCalories}</h5>
+            <Stack sx={{ m: 2 }} className={styles.middle} spacing={1} direction="row">
+                <Button
+                    variant="text"
+                    onClick={props.onClose}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    variant="contained"
+                    disabled={parsedCartItems.length === 0}
+                    onClick={props.onCheckout}
+                >
+                    Checkout
+                </Button>
             </Stack>
         </Dialog>
     );

@@ -3,3 +3,12 @@
     font-size: 14px;
     text-align: left;
 }
+
+.middle {
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.center {
+    text-align: center;
+}

@@ -6,11 +6,13 @@ import TextField from '@mui/material/TextField';
 import FoodList from "../foodList/foodList";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
+import { FoodItems } from "../../interfaces/FoodItems";
 
 export default function Search(props: any) {
-    const [query, setQuery] = useState('');
-    const [foods, setFoods] = useState(null);
-    const [page, setPage] = useState(1);
+    const [query, setQuery] = useState<string>('');
+    const [foods, setFoods] = useState<FoodItems>(null);
+    const [page, setPage] = useState<number>(1);
+    const [fetchError, setFetchError] = useState<boolean>(false);
 
     const firstUpdate = useRef(true);
     useEffect(() => {
@@ -44,13 +46,17 @@ export default function Search(props: any) {
                 page: page
             })
         })
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data: FoodItems) => {
+                setFetchError(false);
                 setFoods(data.foods.length === 0 ? null : data);
             })
+            .catch(() => {
+                setFetchError(true);
+            });
     }
 
-    function handleCartChange(foodItem) {
+    function handleCartChange(foodItem: string) {
         props.onCartChange(foodItem);
     }
 
@@ -63,10 +69,22 @@ export default function Search(props: any) {
             return (
                 <div>
                     <Stack className={styles.middle} spacing={1} direction="row">
-                        <Button variant="contained" disabled={page === 1} onClick={() => handleChangePage(-1)}>Previous Page</Button>
-                        <Button variant="contained" disabled={page === foods.totalPages} onClick={() => handleChangePage(1)}>Next Page</Button>
+                        <Button
+                            variant="contained"
+                            disabled={page === 1}
+                            onClick={() => handleChangePage(-1)}
+                        >
+                            Previous Page
+                        </Button>
+                        <Button
+                            variant="contained"
+                            disabled={page === foods.totalPages}
+                            onClick={() => handleChangePage(1)}
+                        >
+                            Next Page
+                        </Button>
                     </Stack>
-                    <p>page {page} of {foods.totalPages}</p>
+                    <p>Page {page} of {foods.totalPages}</p>
                 </div>
             )
         }
@@ -78,8 +96,18 @@ export default function Search(props: any) {
                 <Grid container spacing={1}>
                     <Grid item md={3} xs={12}></Grid>
                     <Grid item md={6} xs={12}>
-                        <TextField id="foodSearch" label="Search Any Food" variant="standard" onChange={(e) => setQuery(e.target.value)} />
-                        {query.length > 0 && <FoodList onCartChange={handleCartChange} cart={props.cart} foods={foods}></FoodList>}
+                        <TextField
+                            id="foodSearch"
+                            label="Search Any Food"
+                            variant="standard"
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                        {(query.length > 0 && fetchError === false)
+                            && <FoodList onCartChange={handleCartChange} cart={props.cart} foods={foods}
+                            />}
+                        {fetchError
+                            && <h3>There was an error with your request, please try again?</h3>
+                        }
                         <DisplayPages />
                     </Grid>
                 </Grid>
