@@ -1,3 +1,8 @@
 .center {
     text-align: center;
 }
+
+.middle {
+    justify-content: center;
+    margin-top: 2rem;
+}
