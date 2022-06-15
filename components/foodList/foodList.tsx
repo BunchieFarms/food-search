@@ -1,58 +1,59 @@
-import * as React from 'react';
+import React, { useState } from "react";
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import StarBorder from '@mui/icons-material/StarBorder';
+import ListItem from "@mui/material/ListItem";
 
 export default function FoodList(props: any) {
     const foods = props.foods;
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState<number[]>([] );
 
-    const handleClick = () => {
-        setOpen(!open);
+    const handleClick = (index: number) => {
+        const openArr = open;
+        openArr[index] = openArr[index] === 0 ? 1 : 0;
+        console.log(openArr)
+        setOpen(openArr);
     };
+
+    function DisplayList() {
+        if (foods && foods.foods.length > 0) {
+            return (
+                foods.foods.map((food, index) => {
+                    return (
+                        <div>
+                            <ListItemButton key={index} onClick={() => handleClick(index)}>
+                                <ListItemText primary={food.description} />
+                                {open[index] === 1 ? <ExpandLess /> : <ExpandMore />}
+                            </ListItemButton>
+                            <Collapse in={open[index] === 1} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItem key={index*1000} sx={{ pl: 4 }}>
+                                        <ListItemText primary="Starred" />
+                                    </ListItem>
+                                </List>
+                            </Collapse>
+                        </div>
+                    )
+                })
+            )
+        } else {
+            return (
+                <ListItem key={-1} onClick={handleClick}>
+                    <ListItemText primary="No results!" />
+                </ListItem>
+            )
+        }
+    }
 
     return (
         <List
             sx={{ width: '100%', bgcolor: 'background.paper', textAlign: "center" }}
             component="nav"
         >
-            {(!foods || foods.foods.length === 0) &&
-                <ListItemButton onClick={handleClick}>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="No results!" />
-                </ListItemButton>}
-            {foods.foods.map((food) => {
-                return (
-                    <div>
-                        <ListItemButton onClick={handleClick}>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={food.description} />
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 4 }}>
-                                    <ListItemIcon>
-                                        <StarBorder />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Starred" />
-                                </ListItemButton>
-                            </List>
-                        </Collapse>
-                    </div>
-                )
-            })}
-
+            <DisplayList></DisplayList>
         </List>
     );
 }

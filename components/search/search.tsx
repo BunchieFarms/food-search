@@ -42,8 +42,7 @@ export default function Search(props: any) {
                     <Grid item md={3} xs={12}></Grid>
                     <Grid item md={6} xs={12}>
                         <TextField id="foodSearch" label="Search Any Food" variant="standard" onChange={(e) => setQuery(e.target.value)} />
-                        <FoodList foods={foods}></FoodList>
-                        
+                        {foods && query.length > 1 && <FoodList foods={foods}></FoodList>}
                     </Grid>
                 </Grid>
             </Box>
