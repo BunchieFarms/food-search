@@ -33,12 +33,12 @@ export default function Cart(props: any) {
         }
     }
 
-    const getCalories = (cartItem: any) => {
+    const getCalories = (cartItem: FoodDetail) => {
         const item = cartItem.foodNutrients.find((nutrient) => nutrient.nutrientNumber === '208');
         return item ? `${item.value} calories` : '';
     }
 
-    const getBrandName = (cartItem: any) => {
+    const getBrandName = (cartItem: FoodDetail) => {
         return cartItem.brandName ? `${cartItem.brandName}` : 'Unbranded'
     }
 
@@ -67,7 +67,7 @@ export default function Cart(props: any) {
         } else {
             return (
                 <ListItem button key={1}>
-                    <ListItemText primary='Cart is empty!' />
+                    <ListItemText className={styles.center} primary='Cart is empty!' />
                 </ListItem>
             )
         }
@@ -75,7 +75,7 @@ export default function Cart(props: any) {
 
     return (
         <Dialog onClose={props.handleCartClose} open={cartOpen}>
-            <DialogTitle>Food Cart</DialogTitle>
+            <DialogTitle className={styles.center}>Food Cart</DialogTitle>
             <List sx={{ pt: 0 }}>
                 <DisplayCart />
             </List>
